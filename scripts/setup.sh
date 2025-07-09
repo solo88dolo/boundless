@@ -218,64 +218,64 @@ add_user_to_docker_group() {
     fi
 }
 
-# Function to install NVIDIA Container Toolkit
-install_nvidia_container_toolkit() {
-    info "Checking NVIDIA Container Toolkit installation..."
-
-    if is_package_installed "nvidia-docker2"; then
-        success "NVIDIA Container Toolkit (nvidia-docker2) is already installed."
-        return
-    fi
-
-    info "Installing NVIDIA Container Toolkit..."
-
-    {
-        # Add the package repositories
-        local distribution
-        distribution=$(grep '^ID=' /etc/os-release | cut -d'=' -f2 | tr -d '"')$(grep '^VERSION_ID=' /etc/os-release | cut -d'=' -f2 | tr -d '"')
-        curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
-        curl -s -L https://nvidia.github.io/nvidia-docker/"$distribution"/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
-
-        # Update the package lists
-        sudo apt update -y
-
-        # Install the NVIDIA Docker support
-        sudo apt install -y nvidia-docker2
-
-        # Restart Docker to apply changes
-        sudo systemctl restart docker
-    } >> "$LOG_FILE" 2>&1
-
-    success "NVIDIA Container Toolkit installed successfully."
-}
-
-# Function to configure Docker daemon for NVIDIA
-configure_docker_nvidia() {
-    info "Configuring Docker to use NVIDIA runtime by default..."
-
-    {
-        # Create Docker daemon configuration directory if it doesn't exist
-        sudo mkdir -p /etc/docker
-
-        # Create or overwrite daemon.json with NVIDIA runtime configuration
-        sudo tee /etc/docker/daemon.json <<EOF
-{
-    "default-runtime": "nvidia",
-    "runtimes": {
-        "nvidia": {
-            "path": "nvidia-container-runtime",
-            "runtimeArgs": []
-        }
-    }
-}
-EOF
-
-        # Restart Docker to apply the new configuration
-        sudo systemctl restart docker
-    } >> "$LOG_FILE" 2>&1
-
-    success "Docker configured to use NVIDIA runtime by default."
-}
+# # Function to install NVIDIA Container Toolkit
+# install_nvidia_container_toolkit() {
+#     info "Checking NVIDIA Container Toolkit installation..."
+#
+#     if is_package_installed "nvidia-docker2"; then
+#         success "NVIDIA Container Toolkit (nvidia-docker2) is already installed."
+#         return
+#     fi
+#
+#     info "Installing NVIDIA Container Toolkit..."
+#
+#     {
+#         # Add the package repositories
+#         local distribution
+#         distribution=$(grep '^ID=' /etc/os-release | cut -d'=' -f2 | tr -d '"')$(grep '^VERSION_ID=' /etc/os-release | cut -d'=' -f2 | tr -d '"')
+#         curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+#         curl -s -L https://nvidia.github.io/nvidia-docker/"$distribution"/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+#
+#         # Update the package lists
+#         sudo apt update -y
+#
+#         # Install the NVIDIA Docker support
+#         sudo apt install -y nvidia-docker2
+#
+#         # Restart Docker to apply changes
+#         sudo systemctl restart docker
+#     } >> "$LOG_FILE" 2>&1
+#
+#     success "NVIDIA Container Toolkit installed successfully."
+# }
+#
+# # Function to configure Docker daemon for NVIDIA
+# configure_docker_nvidia() {
+#     info "Configuring Docker to use NVIDIA runtime by default..."
+#
+#     {
+#         # Create Docker daemon configuration directory if it doesn't exist
+#         sudo mkdir -p /etc/docker
+#
+#         # Create or overwrite daemon.json with NVIDIA runtime configuration
+#         sudo tee /etc/docker/daemon.json <<EOF
+# {
+#     "default-runtime": "nvidia",
+#     "runtimes": {
+#         "nvidia": {
+#             "path": "nvidia-container-runtime",
+#             "runtimeArgs": []
+#         }
+#     }
+# }
+# EOF
+#
+#         # Restart Docker to apply the new configuration
+#         sudo systemctl restart docker
+#     } >> "$LOG_FILE" 2>&1
+#
+#     success "Docker configured to use NVIDIA runtime by default."
+# }
 
 # Function to perform system cleanup
 cleanup() {
