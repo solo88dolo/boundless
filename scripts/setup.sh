@@ -318,19 +318,19 @@ update_system
 install_packages
 
 # Install GPU drivers
-install_gpu_drivers
+#install_gpu_drivers
 
 # Install Docker
-install_docker
+#install_docker
 
 # Add user to Docker group
-add_user_to_docker_group
+#add_user_to_docker_group
 
 # Install NVIDIA Container Toolkit
-install_nvidia_container_toolkit
+#install_nvidia_container_toolkit
 
 # Configure Docker to use NVIDIA runtime
-configure_docker_nvidia
+#configure_docker_nvidia
 
 # Install Rust
 install_rust
