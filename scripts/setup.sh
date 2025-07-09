@@ -102,13 +102,13 @@ install_packages() {
 }
 
 # Function to install GPU drivers
-install_gpu_drivers() {
-    info "Detecting and installing appropriate GPU drivers..."
-    {
-        sudo ubuntu-drivers install
-    } >> "$LOG_FILE" 2>&1
-    success "GPU drivers installed successfully."
-}
+# install_gpu_drivers() {
+#     info "Detecting and installing appropriate GPU drivers..."
+#     {
+#         sudo ubuntu-drivers install
+#     } >> "$LOG_FILE" 2>&1
+#     success "GPU drivers installed successfully."
+# }
 
 # Function to install Rust
 install_rust() {
@@ -169,54 +169,54 @@ install_cuda() {
 }
 
 # Function to install Docker
-install_docker() {
-    if command -v docker &> /dev/null; then
-        info "Docker is already installed. Skipping Docker installation."
-    else
-        info "Installing Docker..."
-        {
-            # Install prerequisites
-            sudo apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-
-            # Add Docker’s official GPG key
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
-            # Set up the stable repository
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-            # Update package index
-            sudo apt update -y
-
-            # Install Docker Engine, CLI, and Containerd
-            sudo apt install -y docker-ce docker-ce-cli containerd.io
-
-            # Enable Docker
-            sudo systemctl enable docker
-
-            # Start Docker Service
-            sudo systemctl start docker
-
-        } >> "$LOG_FILE" 2>&1
-        success "Docker installed and started successfully."
-    fi
-}
+# install_docker() {
+#     if command -v docker &> /dev/null; then
+#         info "Docker is already installed. Skipping Docker installation."
+#     else
+#         info "Installing Docker..."
+#         {
+#             # Install prerequisites
+#             sudo apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+#
+#             # Add Docker’s official GPG key
+#             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+#
+#             # Set up the stable repository
+#             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+#
+#             # Update package index
+#             sudo apt update -y
+#
+#             # Install Docker Engine, CLI, and Containerd
+#             sudo apt install -y docker-ce docker-ce-cli containerd.io
+#
+#             # Enable Docker
+#             sudo systemctl enable docker
+#
+#             # Start Docker Service
+#             sudo systemctl start docker
+#
+#         } >> "$LOG_FILE" 2>&1
+#         success "Docker installed and started successfully."
+#     fi
+# }
 
 # Function to add user to Docker group
-add_user_to_docker_group() {
-    local username
-    username=$(logname 2>/dev/null || echo "$SUDO_USER")
-
-    if id -nG "$username" | grep -qw "docker"; then
-        info "User '$username' is already in the 'docker' group."
-    else
-        info "Adding user '$username' to the 'docker' group..."
-        {
-            sudo usermod -aG docker "$username"
-        } >> "$LOG_FILE" 2>&1
-        success "User '$username' added to the 'docker' group."
-        info "To apply the new group membership, please log out and log back in."
-    fi
-}
+# add_user_to_docker_group() {
+#     local username
+#     username=$(logname 2>/dev/null || echo "$SUDO_USER")
+#
+#     if id -nG "$username" | grep -qw "docker"; then
+#         info "User '$username' is already in the 'docker' group."
+#     else
+#         info "Adding user '$username' to the 'docker' group..."
+#         {
+#             sudo usermod -aG docker "$username"
+#         } >> "$LOG_FILE" 2>&1
+#         success "User '$username' added to the 'docker' group."
+#         info "To apply the new group membership, please log out and log back in."
+#     fi
+# }
 
 # # Function to install NVIDIA Container Toolkit
 # install_nvidia_container_toolkit() {
