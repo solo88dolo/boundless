@@ -170,7 +170,7 @@ reaper_interval_secs = 45
 # This provides a buffer time after an order expires before the reaper marks it as failed.
 # This helps prevent race conditions with the aggregator that might be processing the order.
 # If not set, it defaults to 10800 seconds (3 hours).
-reaper_grace_period_secs = 900
+reaper_grace_period_secs = 3600
 
 [batcher]
 # Max batch duration before publishing (in seconds)
