@@ -48,7 +48,7 @@ max_file_size = 75_000_000
 # Max concurrent locks
 #
 # Maximum number of concurrent proofs that can be processed at once
-max_concurrent_proofs = 1
+max_concurrent_proofs = 0
 # Maximum number of orders to concurrently work on pricing
 #
 # Used to limit pricing tasks spawned to prevent overwhelming the system
@@ -176,7 +176,7 @@ reaper_grace_period_secs = 3600
 # Max batch duration before publishing (in seconds)
 batch_max_time = 800
 # Batch size (in proofs) before publishing
-min_batch_size = 2
+min_batch_size = 1
 # Batch blocktime buffer
 #
 # Number of seconds before the lowest block deadline in the order batch
