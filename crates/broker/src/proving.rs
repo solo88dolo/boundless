@@ -129,6 +129,16 @@ impl ProvingService {
                 Ok(existing_proof_id)
             }
             None => {
+                // ✅ NEW: Ensure we only create a proof if the order is locked by this prover
+                let my_address = self.prover.get_address(); // implement or load from config
+                if order.status != OrderStatus::Locked || order.prover_address != my_address {
+                    tracing::warn!(
+                        "Skipping proof creation for order {} - not locked by this prover",
+                        order.id()
+                    );
+                    return Err(anyhow::anyhow!("Order not locked by this prover"));
+                }
+            
                 // This is a new order that needs proving
                 tracing::info!("Proving order {order_id}");
 
