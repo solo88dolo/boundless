@@ -350,6 +350,15 @@ impl ProvingService {
         let now = crate::now_timestamp();
         for order in current_proofs {
             let order_id = order.id();
+            // ✅ NEW: Skip orders that are not locked by this prover
+            let my_address = self.prover.get_address(); // implement get_address() or load from config
+            if order.status != OrderStatus::Locked || order.prover_address != my_address {
+                tracing::info!(
+                    "Skipping order {} - not locked by this prover",
+                    order_id
+                );
+                continue;
+            }
             if order.expire_timestamp.unwrap() < now {
                 tracing::warn!("Order {} had expired on proving task start", order_id);
                 cancel_proof_and_fail_order(
