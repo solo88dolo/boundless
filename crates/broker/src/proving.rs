@@ -289,6 +289,16 @@ impl ProvingService {
             (config.prover.proof_retry_count, config.prover.proof_retry_sleep_ms)
         };
 
+        // ✅ NEW: Ensure order is locked by this prover
+        let my_address = self.prover.get_address(); // implement or read from config
+        if order.status != OrderStatus::Locked || order.prover_address != my_address {
+            tracing::warn!(
+                "Not proving order {} because it is not locked by this prover",
+                order.id()
+            );
+            return;
+        }
+     
         let proof_id = match retry(
             proof_retry_count,
             proof_retry_sleep_ms,
