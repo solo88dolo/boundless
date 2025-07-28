@@ -496,11 +496,6 @@ where
         let lock_jobs = orders.iter().map(|order| {
             async move {
                 let order_id = order.id();
-                // ✅ NEW: Skip orders that are already locked
-                if order.request.locked_by.is_some() {
-                    tracing::info!("Skipping order {} because it is already locked", order_id);
-                    return;
-                }
                 if order.fulfillment_type == FulfillmentType::LockAndFulfill {
                     let request_id = order.request.id;
                     match self.lock_order(order).await {
