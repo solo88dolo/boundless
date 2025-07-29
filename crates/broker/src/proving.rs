@@ -129,15 +129,6 @@ impl ProvingService {
                 Ok(existing_proof_id)
             }
             None => {
-                // ✅ NEW: Ensure we only create a proof if the order is locked by this prover
-                let my_address = self.prover.get_address(); // implement or load from config
-                if order.status != OrderStatus::Locked || order.prover_address != my_address {
-                    tracing::warn!(
-                        "Skipping proof creation for order {} - not locked by this prover",
-                        order.id()
-                    );
-                    return Err(anyhow::anyhow!("Order not locked by this prover"));
-                }
             
                 // This is a new order that needs proving
                 tracing::info!("Proving order {order_id}");
@@ -298,16 +289,6 @@ impl ProvingService {
             let config = self.config.lock_all().unwrap();
             (config.prover.proof_retry_count, config.prover.proof_retry_sleep_ms)
         };
-
-        // ✅ NEW: Ensure order is locked by this prover
-        let my_address = self.prover.get_address(); // implement or read from config
-        if order.status != OrderStatus::Locked || order.prover_address != my_address {
-            tracing::warn!(
-                "Not proving order {} because it is not locked by this prover",
-                order.id()
-            );
-            return;
-        }
      
         let proof_id = match retry(
             proof_retry_count,
@@ -370,15 +351,6 @@ impl ProvingService {
         let now = crate::now_timestamp();
         for order in current_proofs {
             let order_id = order.id();
-            // ✅ NEW: Skip orders that are not locked by this prover
-            let my_address = self.prover.get_address(); // implement get_address() or load from config
-            if order.status != OrderStatus::Locked || order.prover_address != my_address {
-                tracing::info!(
-                    "Skipping order {} - not locked by this prover",
-                    order_id
-                );
-                continue;
-            }
             if order.expire_timestamp.unwrap() < now {
                 tracing::warn!("Order {} had expired on proving task start", order_id);
                 cancel_proof_and_fail_order(
