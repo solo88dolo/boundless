@@ -235,6 +235,12 @@ where
         let order_id = order.id();
         tracing::debug!("Pricing order {order_id}");
 
+        // Skip
+        if order.fulfillment_type FulfillmentType:: FulfillAfterLockExpire {
+            tracing:: info! ("Skipping secondary order (order_id) (FulfillAfterLockExpire)");
+            return Ok(Skip);
+        }
+
         // Short circuit if the order has been locked.
         if order.fulfillment_type == FulfillmentType::LockAndFulfill
             && self
