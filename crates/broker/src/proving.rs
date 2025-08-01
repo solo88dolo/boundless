@@ -1,7 +1,7 @@
 // Copyright (c) 2025 RISC Zero, Inc.
 //
 // All rights reserved.
-
+use boundless_market::contracts::IBoundlessMarket; // add at top of file if not already
 use std::future::pending;
 use std::time::Duration;
 
@@ -58,6 +58,38 @@ pub struct ProvingService {
 }
 
 impl ProvingService {
+     // ✅ NEW FUNCTION
+    async fn ensure_locked_order(&self, order: &Order) -> Result<bool, anyhow::Error> {
+        // Assume prover has a boundless client instance. You might need to pass it into ProvingService if not already available
+        let client = self.prover.boundless_client(); 
+        let expires_at = order.expire_timestamp.unwrap_or_default();
+
+        let status = client
+            .boundless_market
+            .get_status(order.request.id, Some(expires_at))
+            .await?;
+
+        match status {
+            RequestStatus::Locked => {
+                tracing::info!("Order {} is already locked by me", order.id());
+                Ok(true)
+            }
+            _ => {
+                tracing::info!("Order {} is not locked. Attempting to lock...", order.id());
+
+                match client.boundless_market.lock_request(order.request.id).await {
+                    Ok(_) => {
+                        tracing::info!("Successfully locked order {}", order.id());
+                        Ok(true)
+                    }
+                    Err(e) => {
+                        tracing::warn!("Failed to lock order {}: {:?}", order.id(), e);
+                        Ok(false)
+                    }
+                }
+            }
+        }
+    }
     pub async fn new(
         db: DbObj,
         prover: ProverObj,
@@ -284,7 +316,12 @@ impl ProvingService {
 
     async fn prove_and_update_db(&self, mut order: Order) {
         let order_id = order.id();
-
+        // ✅ NEW: Check if locked or try locking first
+        if !self.ensure_locked_order(&order).await.unwrap_or(false) {
+            tracing::info!("Skipping order {} because it's not locked by me", order_id);
+            return;
+        }
+        
         let (proof_retry_count, proof_retry_sleep_ms) = {
             let config = self.config.lock_all().unwrap();
             (config.prover.proof_retry_count, config.prover.proof_retry_sleep_ms)
