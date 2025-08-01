@@ -420,20 +420,6 @@ where
         proof_res: &ProofResult,
     ) -> Result<OrderPricingOutcome, OrderPickerErr> {
         let order_id = order.id();
-        if order.fulfillment_type == FulfillmentType::LockAndFulfill {
-            tracing::info!("✅ Committing to locked order {order_id}");
-            let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_secs();
-            
-            // Compute price based on the current timestamp
-            let price: U256 = order.request.offer.price_at(now)?;
-            Ok(OrderPricingOutcome::CommitWithPrice(price))
-        } else {
-            tracing::info!("⏭️ Skipping order {order_id} (not locked)");
-            Ok(OrderPricingOutcome::Skip)
-        }
         
         // Get peak_prove_khz from config to respect capacity limits
         let peak_prove_khz = {
